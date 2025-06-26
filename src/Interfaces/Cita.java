@@ -1,15 +1,21 @@
 
 package Interfaces;
 
+import Sql.Conexion;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.List;
 import javax.swing.JOptionPane;
 
 
 public class Cita extends javax.swing.JFrame {
     private String rolUsuario;
+    private int idPaciente;
   
-    public Cita(String rolUsuario) {
+    public Cita(String rolUsuario, int idPaciente) {
     this.rolUsuario = rolUsuario;
+    this.idPaciente = idPaciente;
     initComponents();
     cargarEspecialidades();
     cargarCentrosSalud();
@@ -190,32 +196,41 @@ public class Cita extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void buttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonActionPerformed
-         try {
-       
+
+       try {
         String fechaHora = txtFecha.getText().trim();  
         String especialidad = (String) comboEspecialidades.getSelectedItem();
         String nombreCentro = (String) comboCentroSalud.getSelectedItem();
 
-       
         if (fechaHora.isEmpty() || especialidad == null || nombreCentro == null) {
             JOptionPane.showMessageDialog(this, "Por favor, complete todos los campos.");
             return;
         }
 
-  
         MedicoDAO medicoDAO = new MedicoDAO();
         int idMedico = medicoDAO.obtenerIdMedicoPorEspecialidad(especialidad);
 
-       
         HospitalDAO hospitalDAO = new HospitalDAO();
         int idCentro = hospitalDAO.obtenerIdCentroPorNombre(nombreCentro);
 
-      
-        Citas cita = new Citas(fechaHora, especialidad, "Pendiente", idMedico, idCentro);
+        Interfaces.PacientesDAO pacientesDAO = new Interfaces.PacientesDAO();
+        pacientesDAO.registrarSiNoExiste(idPaciente);
 
-        
+        try (Connection conn = Conexion.getConexion();
+             PreparedStatement ps = conn.prepareStatement("SELECT * FROM historialclinico WHERE id_paciente = ?")) {
+            ps.setInt(1, idPaciente);
+            ResultSet rs = ps.executeQuery();
+            if (!rs.next()) {
+                try (PreparedStatement insert = conn.prepareStatement("INSERT INTO historialclinico (id_paciente) VALUES (?)")) {
+                    insert.setInt(1, idPaciente);
+                    insert.executeUpdate();
+                }
+            }
+        }
+
+        Citas cita = new Citas(fechaHora, especialidad, "Pendiente", idPaciente, idMedico, idCentro);
         CitaDAO citaDAO = new CitaDAO();
-        boolean resultado = citaDAO.insertar(cita);
+        boolean resultado = citaDAO.insertarConPaciente(cita);
 
         if (resultado) {
             JOptionPane.showMessageDialog(this, "Cita registrada correctamente.");
@@ -223,13 +238,13 @@ public class Cita extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Error al registrar la cita.");
         }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
-        }
-        txtFecha.setText("");  
-        comboEspecialidades.setSelectedIndex(-1);  
-        comboCentroSalud.setSelectedIndex(-1); 
+    } catch (Exception e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+    }
+    txtFecha.setText("");  
+    comboEspecialidades.setSelectedIndex(-1);  
+    comboCentroSalud.setSelectedIndex(-1); 
     }//GEN-LAST:event_buttonActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -268,7 +283,7 @@ public class Cita extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                  new Cita("admin").setVisible(true); 
+                   new Cita("admin", 1).setVisible(true); 
             }
         });
     }

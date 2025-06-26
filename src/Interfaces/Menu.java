@@ -45,7 +45,7 @@ public class Menu extends javax.swing.JFrame {
         
         
         if ("admin".equalsIgnoreCase(rolUsuario)) {
-        btnCitas.setVisible(true);
+        btnCitas.setVisible(false);
         btnPerfil.setVisible(true);
         btnHospital.setVisible(true);
         btnPersonal.setVisible(true);
@@ -350,13 +350,24 @@ public class Menu extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnPerfilActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPerfilActionPerformed
-       
+            Perfil perfil = new Perfil(rolUsuario);
+            perfil.setLocationRelativeTo(null);
+            perfil.setVisible(true);
+            this.dispose();
+            
     }//GEN-LAST:event_btnPerfilActionPerformed
 
     private void btnCitasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCitasActionPerformed
-            Cita citas = new Cita(rolUsuario);
-            citas.setLocationRelativeTo(null); 
-            citas.setVisible(true); 
+            Usuario usuario = Sesion.getUsuarioActual();
+
+            if (!usuario.getRol().equalsIgnoreCase("paciente")) {
+                JOptionPane.showMessageDialog(this, "Solo los pacientes pueden registrar citas.");
+                return;
+            }
+
+            int idUsuarioLogueado = usuario.getId_usuario(); 
+            Cita cita = new Cita(usuario.getRol(), idUsuarioLogueado);
+            cita.setVisible(true);
             this.dispose();
     }//GEN-LAST:event_btnCitasActionPerformed
             
@@ -399,7 +410,7 @@ public class Menu extends javax.swing.JFrame {
         try {
             System.out.println("Iniciando exportación a PDF...");
             
-            // Obtener todos los usuarios
+          
             UsuarioDAO usuarioDAO = UsuarioDAO.getInstance();
             List<Usuario> usuarios = usuarioDAO.obtenerTodosLosUsuarios();
             System.out.println("Usuarios obtenidos: " + usuarios.size());
@@ -412,17 +423,17 @@ public class Menu extends javax.swing.JFrame {
                 return;
             }
 
-            // Crear directorio si no existe
+           
             File directory = new File("reportes");
             if (!directory.exists()) {
                 directory.mkdirs();
             }
 
-            // Nombre del archivo
+           
             String fileName = "reportes" + File.separator + "Usuarios_" + 
                             LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE) + ".pdf";
             
-            // Generar el reporte PDF
+            
             PDFReportGenerator.generarReporteUsuarios(usuarios, fileName);
             
             JOptionPane.showMessageDialog(this, 

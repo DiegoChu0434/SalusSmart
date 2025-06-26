@@ -189,82 +189,82 @@ public class Register extends javax.swing.JFrame {
 
     private void btnregi4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnregi4ActionPerformed
                                        
-            String nombre = txtNombre.getText().trim();
-            String apellido = txtApellido.getText().trim();
-            String correo = txtCorreo.getText().trim();
-            String dniText = txtDni.getText().trim();
-            String fecha = txtFecha.getText().trim();
-            String direccion = txtDireccion.getText().trim();
-            String celularText = txtCelular.getText().trim();
-            String contraseña = new String(txtContraseña.getPassword()).trim();
-            String rol = "Paciente";
+        String nombre = txtNombre.getText().trim();
+        String apellido = txtApellido.getText().trim();
+        String correo = txtCorreo.getText().trim();
+        String dniText = txtDni.getText().trim();
+        String fecha = txtFecha.getText().trim();
+        String direccion = txtDireccion.getText().trim();
+        String celularText = txtCelular.getText().trim();
+        String contraseña = new String(txtContraseña.getPassword()).trim();
+        String rol = "Paciente";
 
-            if (nombre.isEmpty() || apellido.isEmpty() || correo.isEmpty() ||
-                dniText.isEmpty() || fecha.isEmpty() || direccion.isEmpty() ||
-                celularText.isEmpty() || contraseña.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Por favor, completa todos los campos.", "Campos incompletos", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
+        if (nombre.isEmpty() || apellido.isEmpty() || correo.isEmpty() ||
+            dniText.isEmpty() || fecha.isEmpty() || direccion.isEmpty() ||
+            celularText.isEmpty() || contraseña.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Por favor, completa todos los campos.", "Campos incompletos", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
 
-            if (dniText.length() != 8 || !StringUtils.isNumeric(dniText)) {
-                JOptionPane.showMessageDialog(this, "El DNI debe tener exactamente 8 dígitos numéricos.", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
+        if (dniText.length() != 8 || !StringUtils.isNumeric(dniText)) {
+            JOptionPane.showMessageDialog(this, "El DNI debe tener exactamente 8 dígitos numéricos.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-            if (celularText.length() != 9 || !celularText.matches("\\d+")) {
-                JOptionPane.showMessageDialog(this, "El celular debe tener exactamente 9 dígitos numéricos.", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
+        if (celularText.length() != 9 || !celularText.matches("\\d+")) {
+            JOptionPane.showMessageDialog(this, "El celular debe tener exactamente 9 dígitos numéricos.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-           if (Strings.isNullOrEmpty(correo) || !correo.contains("@") || correo.startsWith("@") || correo.endsWith("@")) {
-                JOptionPane.showMessageDialog(this, "El correo electrónico debe contener un '@' válido.", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
+        if (Strings.isNullOrEmpty(correo) || !correo.contains("@") || correo.startsWith("@") || correo.endsWith("@")) {
+            JOptionPane.showMessageDialog(this, "El correo electrónico debe contener un '@' válido.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        try {
+            int dni = Integer.parseInt(dniText);
 
             try {
-                int dni = Integer.parseInt(dniText);
-
-                try {
-                    java.time.LocalDate.parse(fecha);
-                } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(this, "La fecha debe tener el formato año-mes-dia.", "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                // Usando getInstance() en lugar del constructor
-                UsuarioDAO usuarioDAO = UsuarioDAO.getInstance();
-
-                if (usuarioDAO.existeUsuarioPorDniOCorreo(dni, correo)) {
-                    JOptionPane.showMessageDialog(this, "El correo o DNI ya están registrados.", "Registro duplicado", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                Usuario nuevoUsuario = new Usuario(0, nombre, apellido, dni, fecha, direccion, celularText, correo, contraseña, rol);
-
-                if (usuarioDAO.registrarUsuario(nuevoUsuario)) {
-                    JOptionPane.showMessageDialog(this, "Se ha registrado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-
-                    txtNombre.setText("");
-                    txtApellido.setText("");
-                    txtCorreo.setText("");
-                    txtDni.setText("");
-                    txtFecha.setText("");
-                    txtDireccion.setText("");
-                    txtCelular.setText("");
-                    txtContraseña.setText("");
-
-                    Login login = new Login();
-                    login.setVisible(true);
-                    this.dispose();
-                } else {
-                    JOptionPane.showMessageDialog(this, "No se pudo registrar. Intenta de nuevo.", "Error", JOptionPane.ERROR_MESSAGE);
-                }
-
-            } catch (NumberFormatException nfe) {
-                JOptionPane.showMessageDialog(this, "DNI inválido, debe ser numérico.", "Error", JOptionPane.ERROR_MESSAGE);
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(this, "Error inesperado: " + e.getMessage(), "Excepción", JOptionPane.ERROR_MESSAGE);
-                e.printStackTrace();
+                java.time.LocalDate.parse(fecha);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "La fecha debe tener el formato año-mes-dia.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
             }
+
+            UsuarioDAO usuarioDAO = UsuarioDAO.getInstance();
+
+            if (usuarioDAO.existeUsuarioPorDniOCorreo(dni, correo)) {
+                JOptionPane.showMessageDialog(this, "El correo o DNI ya están registrados.", "Registro duplicado", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            Usuario nuevoUsuario = new Usuario(0, nombre, apellido, dni, fecha, direccion, celularText, correo, contraseña, rol);
+
+            if (usuarioDAO.registrarUsuario(nuevoUsuario)) {
+               
+                Sesion.setUsuarioActual(nuevoUsuario);
+
+                
+                JOptionPane.showMessageDialog(this, "Se ha registrado correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+
+            } else {
+                JOptionPane.showMessageDialog(this, "No se pudo registrar. Intenta de nuevo.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+        } catch (NumberFormatException nfe) {
+            JOptionPane.showMessageDialog(this, "DNI inválido, debe ser numérico.", "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error inesperado: " + e.getMessage(), "Excepción", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+        txtNombre.setText("");
+        txtApellido.setText("");
+        txtCorreo.setText("");
+        txtDni.setText("");
+        txtFecha.setText("");
+        txtDireccion.setText("");
+        txtCelular.setText("");
+        txtContraseña.setText("");
 
     }//GEN-LAST:event_btnregi4ActionPerformed
 

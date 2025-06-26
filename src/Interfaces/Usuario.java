@@ -38,7 +38,12 @@ public class Usuario {
     public String getContraseña() { return contraseña; }
     public String getRol() { return rol; }
 
-    double getId() {
-        throw new UnsupportedOperationException("Not supported yet."); 
-    }
+          public int getId() {
+             return id_usuario;
+         }
+
+        public void setId(int id_usuario) {
+            this.id_usuario = id_usuario;
+        }
+
 }

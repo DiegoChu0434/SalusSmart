@@ -91,5 +91,29 @@ public class PacientesDAO {
             }
             return -1;
         }
+        
+          public void registrarSiNoExiste(int idUsuario) {
+        String verificarSQL = "SELECT * FROM paciente WHERE id_paciente = ?";
+        String insertarSQL = "INSERT INTO paciente (id_paciente) VALUES (?)";
 
+        try (Connection conn = Conexion.getConexion();
+             PreparedStatement verificar = conn.prepareStatement(verificarSQL)) {
+
+            verificar.setInt(1, idUsuario);
+            ResultSet rs = verificar.executeQuery();
+
+            if (!rs.next()) {
+                try (PreparedStatement insertar = conn.prepareStatement(insertarSQL)) {
+                    insertar.setInt(1, idUsuario);
+                    insertar.executeUpdate();
+                    System.out.println("Paciente registrado en tabla 'paciente'.");
+                }
+            } else {
+                System.out.println("Paciente ya existe en tabla 'paciente'.");
+            }
+
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
 }

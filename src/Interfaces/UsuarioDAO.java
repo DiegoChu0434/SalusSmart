@@ -48,16 +48,16 @@ public class UsuarioDAO {
     }
 
     public boolean registrarUsuario(Usuario usuario) {
-        // Validaciones con Preconditions de Guava
-        Preconditions.checkNotNull(usuario, "El usuario no puede ser null");
+       
+         Preconditions.checkNotNull(usuario, "El usuario no puede ser null");
         Preconditions.checkArgument(usuario.getDni() > 0, "DNI inválido");
-        Preconditions.checkArgument(usuario.getCorreo() != null && !usuario.getCorreo().isEmpty(), 
+        Preconditions.checkArgument(usuario.getCorreo() != null && !usuario.getCorreo().isEmpty(),
             "El correo no puede estar vacío");
 
         String sql = "INSERT INTO Usuario (nombres, apellidos, dni, fecha_nacimiento, direccion, contacto, correo, contraseña, rol) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = conexionDB.obtenerConexion();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
 
             ps.setString(1, usuario.getNombre());
             ps.setString(2, usuario.getApellido());
@@ -71,10 +71,16 @@ public class UsuarioDAO {
 
             int filas = ps.executeUpdate();
             if (filas > 0) {
-                // Si el registro es exitoso, agregamos al cache
+                ResultSet generatedKeys = ps.getGeneratedKeys();
+                if (generatedKeys.next()) {
+                    int idGenerado = generatedKeys.getInt(1);
+                    usuario.setId(idGenerado); // Necesario: método setId
+                }
+
                 userCache.put(usuario.getDni(), usuario);
                 return true;
             }
+
             return false;
 
         } catch (Exception e) {
@@ -147,29 +153,41 @@ public class UsuarioDAO {
         }
     }
     
-    public Optional<String> validarLogin(String correo, String contraseña) {
-        Preconditions.checkNotNull(correo, "El correo no puede ser null");
-        Preconditions.checkNotNull(contraseña, "La contraseña no puede ser null");
+    public Optional<Usuario> validarLogin(String correo, String contraseña) {
+         Preconditions.checkNotNull(correo, "El correo no puede ser null");
+    Preconditions.checkNotNull(contraseña, "La contraseña no puede ser null");
 
-        String sql = "SELECT nombres FROM Usuario WHERE correo = ? AND contraseña = ?";
+    String sql = "SELECT * FROM Usuario WHERE correo = ? AND contraseña = ?";
 
-        try (Connection conn = conexionDB.obtenerConexion();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+    try (Connection conn = conexionDB.obtenerConexion();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, correo);
-            ps.setString(2, contraseña);
+        ps.setString(1, correo);
+        ps.setString(2, contraseña);
 
-            ResultSet rs = ps.executeQuery();
+        ResultSet rs = ps.executeQuery();
 
-            if (rs.next()) {
-                return Optional.of(rs.getString("nombres"));
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (rs.next()) {
+            Usuario usuario = new Usuario(
+                rs.getInt("id_usuario"),
+                rs.getString("nombres"),
+                rs.getString("apellidos"),
+                rs.getInt("dni"),
+                rs.getString("fecha_nacimiento"),
+                rs.getString("direccion"),
+                rs.getString("contacto"),
+                rs.getString("correo"),
+                rs.getString("contraseña"),
+                rs.getString("rol")
+            );
+            return Optional.of(usuario);
         }
 
-        return Optional.empty();
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return Optional.empty();
     }
 
     // Método para obtener estadísticas del caché

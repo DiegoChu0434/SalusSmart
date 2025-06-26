@@ -126,10 +126,11 @@ private static final Logger logger = LogManager.getLogger(Register.class);
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnIniActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIniActionPerformed
-         String correo = txtCorreo.getText().trim();
-         String contraseña = new String(txtContraseña.getPassword()).trim();
+        String correo = txtCorreo.getText().trim();
+        String contraseña = new String(txtContraseña.getPassword()).trim();
 
         logger.info("Intento de inicio de sesión con correo: " + correo);
+
         if (correo.isEmpty() || contraseña.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Por favor, complete todos los campos");
             return;
@@ -144,17 +145,24 @@ private static final Logger logger = LogManager.getLogger(Register.class);
             return;
         }
 
+       
         UsuarioDAO usuarioDAO = UsuarioDAO.getInstance();
-        Optional<String> nombreUsuario = usuarioDAO.validarLogin(correo, contraseña);
+        Optional<Usuario> usuarioLogueado = usuarioDAO.validarLogin(correo, contraseña);
 
-        if (nombreUsuario != null) {
-            JOptionPane.showMessageDialog(this, "¡Bienvenido " + nombreUsuario.get() + "!", "Login exitoso", JOptionPane.INFORMATION_MESSAGE);
-            Menu menu = new Menu("paciente");
+        if (usuarioLogueado.isPresent()) {
+            Usuario usuario = usuarioLogueado.get();
+
+      
+            Sesion.setUsuarioActual(usuario);
+
+            JOptionPane.showMessageDialog(this, "¡Bienvenido " + usuario.getNombre() + "!", "Login exitoso", JOptionPane.INFORMATION_MESSAGE);
+
+            Menu menu = new Menu(usuario.getRol());
             menu.setLocationRelativeTo(null);
             menu.setVisible(true);
             dispose();
         } else {
-            JOptionPane.showMessageDialog(this, "Credenciales incorrectas");
+            JOptionPane.showMessageDialog(this, "Correo o contraseña incorrectos", "Error de autenticación", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnIniActionPerformed
 
