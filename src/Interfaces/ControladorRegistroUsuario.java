@@ -41,7 +41,7 @@ public class ControladorRegistroUsuario {
         }
     }
     
-    // Método para validar la conexión
+    
     public boolean testConexion() {
         try {
             return conexion != null && !conexion.isClosed();

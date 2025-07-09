@@ -142,4 +142,29 @@ public class CitaDAO {
               return false;
           }
       }
+        public Citas obtenerCitaPorId(int idCita) {
+            String sql = "SELECT * FROM citamedica WHERE id_cita = ?";
+            try (Connection con = Conexion.getConexion();
+                 PreparedStatement ps = con.prepareStatement(sql)) {
+                ps.setInt(1, idCita);
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) {
+                    return new Citas(
+                        rs.getInt("id_cita"),
+                        rs.getString("fecha_hora"),
+                        rs.getString("tipo_atencion"),
+                        rs.getString("estado"),
+                        rs.getInt("id_paciente"),
+                        rs.getInt("id_medico"),
+                        rs.getInt("id_centro")
+                    );
+                }
+            } catch (SQLException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+       
+
+
 }

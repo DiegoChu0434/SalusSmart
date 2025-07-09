@@ -8,7 +8,9 @@ public class Citas {
     private int idPaciente;
     private int idMedico;
     private int idCentro;
-
+   
+    
+    
     public Citas(int idCita, String fechaHora, String tipoAtencion, String estado, int idPaciente, int idMedico, int idCentro) {
         this.idCita = idCita;
         this.fechaHora = fechaHora;

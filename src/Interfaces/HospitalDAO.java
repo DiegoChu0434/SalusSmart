@@ -116,4 +116,22 @@ public class HospitalDAO {
             }
             return -1; 
         }
+         
+         public String obtenerNombreCentroPorId(int idCentro) {
+            String sql = "SELECT nombre FROM centrosalud WHERE id_centro = ?";
+            try (Connection con = Conexion.getConexion();
+                 PreparedStatement ps = con.prepareStatement(sql)) {
+                ps.setInt(1, idCentro);
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) {
+                    return rs.getString("nombre");
+                }   
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+         
+       
+
 }

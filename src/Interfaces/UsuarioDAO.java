@@ -16,21 +16,21 @@ public class UsuarioDAO {
     private static UsuarioDAO instancia;
     private final IConexionDB conexionDB;
     
-    // Cache con Guava
+   
     private final Cache<Integer, Usuario> userCache;
     
-    // Constructor privado para Singleton
+ 
     private UsuarioDAO() {
         this.conexionDB = new Conexion();
-        // Configuración del cache con Guava
+        
         this.userCache = CacheBuilder.newBuilder()
-            .maximumSize(100)                    // Máximo 100 usuarios en cache
-            .expireAfterWrite(15, TimeUnit.MINUTES)  // Expira después de 15 minutos
-            .recordStats()                       // Habilita estadísticas
+            .maximumSize(100)                  
+            .expireAfterWrite(15, TimeUnit.MINUTES) 
+            .recordStats()                     
             .build();
     }
 
-    // Constructor para inyección de dependencias
+    
     public UsuarioDAO(IConexionDB conexionDB) {
         this.conexionDB = conexionDB;
         this.userCache = CacheBuilder.newBuilder()
@@ -92,7 +92,7 @@ public class UsuarioDAO {
     public Optional<Usuario> buscarUsuarioPorDni(int dni) {
         Preconditions.checkArgument(dni > 0, "DNI inválido");
 
-        // Primero intentamos obtener del cache
+        
         Usuario cachedUser = userCache.getIfPresent(dni);
         if (cachedUser != null) {
             return Optional.of(cachedUser);
@@ -118,7 +118,7 @@ public class UsuarioDAO {
                     rs.getString("contraseña"),
                     rs.getString("rol")
                 );
-                // Guardamos en cache para futuras consultas
+             
                 userCache.put(dni, usuario);
                 return Optional.of(usuario);
             }
@@ -132,7 +132,7 @@ public class UsuarioDAO {
         Preconditions.checkArgument(dni > 0, "DNI inválido");
         Preconditions.checkNotNull(correo, "El correo no puede ser null");
 
-        // Primero verificamos en el cache
+      
         if (userCache.getIfPresent(dni) != null) {
             return true;
         }
@@ -190,7 +190,7 @@ public class UsuarioDAO {
     return Optional.empty();
     }
 
-    // Método para obtener estadísticas del caché
+ 
     public String getCacheStats() {
         return userCache.stats().toString();
     }

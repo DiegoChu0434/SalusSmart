@@ -33,7 +33,7 @@ public class PacientesDAO {
                     rs.getString("direccion"),
                     rs.getString("contacto"),
                     rs.getString("correo"),
-                    "", // contraseña no se pasa
+                    "", 
                     rs.getString("rol")
                 );
             }
@@ -115,5 +115,31 @@ public class PacientesDAO {
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         }
+    }
+
+    public List<Usuario> obtenerTodosLosUsuarios() {
+        List<Usuario> lista = new ArrayList<>();
+        String sql = "SELECT id_usuario, nombres, apellidos, dni, fecha_nacimiento, direccion, contacto, correo, rol FROM Usuario";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Usuario u = new Usuario(
+                    rs.getInt("id_usuario"),
+                    rs.getString("nombres"),
+                    rs.getString("apellidos"),
+                    rs.getInt("dni"),
+                    rs.getString("fecha_nacimiento"),
+                    rs.getString("direccion"),
+                    rs.getString("contacto"),
+                    rs.getString("correo"),
+                    "", // contraseña no se pasa
+                    rs.getString("rol")
+                );
+                lista.add(u);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return lista;
     }
 }

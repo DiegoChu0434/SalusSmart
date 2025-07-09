@@ -209,6 +209,67 @@ public class MedicoDAO {
             return idMedico;
         }
 
+    public List<Medico> obtenerTodosLosMedicos() {
+        List<Medico> medicos = new ArrayList<>();
+        String sql = "SELECT id_medico, nombre, apellido FROM personalmedico";
+        try (Connection conn = Conexion.getConexion();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Medico medico = new Medico();
+                medico.setId(rs.getInt("id_medico"));
+                medico.setNombre(rs.getString("nombre"));
+                medico.setApellido(rs.getString("apellido"));
+                medicos.add(medico);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return medicos;
+    }
+
+    public List<Medico> obtenerMedicosPorEspecialidad(String especialidad) {
+        List<Medico> medicos = new ArrayList<>();
+        String sql = "SELECT id_medico, nombre, apellido FROM personalmedico WHERE especialidad = ?";
+        try (Connection conn = Conexion.getConexion();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, especialidad);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Medico medico = new Medico();
+                medico.setId(rs.getInt("id_medico"));
+                medico.setNombre(rs.getString("nombre"));
+                medico.setApellido(rs.getString("apellido"));
+                medicos.add(medico);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return medicos;
+    }
+    
+      public Medico obtenerMedicoPorId(int idMedico) {
+         String sql = "SELECT * FROM personalmedico WHERE id_medico = ?";
+         try (Connection con = Conexion.getConexion();
+              PreparedStatement ps = con.prepareStatement(sql)) {
+             ps.setInt(1, idMedico);
+             ResultSet rs = ps.executeQuery();
+             if (rs.next()) {
+                 Medico m = new Medico();
+                 m.setId(rs.getInt("id_medico"));
+                 m.setNombre(rs.getString("nombre"));
+                 m.setApellido(rs.getString("apellido"));
+                 m.setEspecialidad(rs.getString("especialidad"));
+                 return m;
+             }
+         } catch (Exception e) {
+             e.printStackTrace();
+         }
+         return null;
+     }
 
 
 }
+
+ 
+  

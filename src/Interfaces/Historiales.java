@@ -8,6 +8,7 @@ public class Historiales {
     private String especialidad;
     private String centroSalud;
     private String estado;
+    private int idCita;
 
     public Historiales(int idHistorial, String nombrePaciente, String fechaCita,
                       String nombreMedico, String especialidad, String centroSalud, String estado) {
@@ -18,6 +19,26 @@ public class Historiales {
         this.especialidad = especialidad;
         this.centroSalud = centroSalud;
         this.estado = estado;
+    }
+    
+    public Historiales(int idHistorial, int idCita, String nombrePaciente, String fechaCita,
+                      String nombreMedico, String especialidad, String centroSalud, String estado) {
+        this.idHistorial = idHistorial;
+        this.idCita = idCita;
+        this.nombrePaciente = nombrePaciente;
+        this.fechaCita = fechaCita;
+        this.nombreMedico = nombreMedico;
+        this.especialidad = especialidad;
+        this.centroSalud = centroSalud;
+        this.estado = estado;
+    }
+
+    public int getIdCita() {
+        return idCita;
+    }
+
+    public void setIdCita(int idCita) {
+        this.idCita = idCita;
     }
 
     public int getIdHistorial() {
@@ -75,6 +96,4 @@ public class Historiales {
     public void setEstado(String estado) {
         this.estado = estado;
     }
-
-   
 }

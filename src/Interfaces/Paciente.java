@@ -1,4 +1,3 @@
-
 package Interfaces;
 
 import Sql.Conexion;
@@ -21,6 +20,9 @@ public class Paciente extends javax.swing.JFrame {
     public Paciente(String rolUsuario) {
         initComponents();
         this.rolUsuario = rolUsuario;
+        PacientesDAO dao = new PacientesDAO();
+        List<Usuario> lista = dao.obtenerTodosLosUsuarios();
+        llenarTablaConPacientes(lista);
     }
     private void llenarTablaConPacientes(List<Usuario> lista) {
         String[] columnas = {"ID", "Nombre", "Apellido", "DNI", "Fecha Nac.", "Celular", "Dirección", "Correo", "Rol"};
@@ -51,8 +53,7 @@ public class Paciente extends javax.swing.JFrame {
         btnBuscar = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
-        btnBorrar = new javax.swing.JButton();
-        btnEditar = new javax.swing.JButton();
+        bntActulizar = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
         title = new javax.swing.JLabel();
         txtdni = new javax.swing.JTextField();
@@ -107,27 +108,15 @@ public class Paciente extends javax.swing.JFrame {
             jTable1.getColumnModel().getColumn(3).setResizable(false);
         }
 
-        btnBorrar.setBackground(new java.awt.Color(18, 90, 173));
-        btnBorrar.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        btnBorrar.setForeground(new java.awt.Color(255, 255, 255));
-        btnBorrar.setText("Borrar");
-        btnBorrar.setBorderPainted(false);
-        btnBorrar.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        btnBorrar.addActionListener(new java.awt.event.ActionListener() {
+        bntActulizar.setBackground(new java.awt.Color(18, 90, 173));
+        bntActulizar.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        bntActulizar.setForeground(new java.awt.Color(255, 255, 255));
+        bntActulizar.setText("Actulizar");
+        bntActulizar.setBorderPainted(false);
+        bntActulizar.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        bntActulizar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnBorrarActionPerformed(evt);
-            }
-        });
-
-        btnEditar.setBackground(new java.awt.Color(18, 90, 173));
-        btnEditar.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        btnEditar.setForeground(new java.awt.Color(255, 255, 255));
-        btnEditar.setText("Editar");
-        btnEditar.setBorderPainted(false);
-        btnEditar.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        btnEditar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnEditarActionPerformed(evt);
+                bntActulizarActionPerformed(evt);
             }
         });
 
@@ -138,7 +127,8 @@ public class Paciente extends javax.swing.JFrame {
             }
         });
 
-        title.setText("Pacientes");
+        title.setFont(new java.awt.Font("Verdana", 3, 12)); // NOI18N
+        title.setText("USUARIOS");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -152,15 +142,13 @@ public class Paciente extends javax.swing.JFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(txtdni, javax.swing.GroupLayout.PREFERRED_SIZE, 615, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 129, Short.MAX_VALUE)
                                 .addComponent(btnBuscar))
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jButton1)
                                 .addGap(539, 539, 539)
-                                .addComponent(btnEditar, javax.swing.GroupLayout.DEFAULT_SIZE, 124, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(btnBorrar, javax.swing.GroupLayout.DEFAULT_SIZE, 126, Short.MAX_VALUE)))
+                                .addComponent(bntActulizar, javax.swing.GroupLayout.PREFERRED_SIZE, 222, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(50, 50, 50))))
         );
         layout.setVerticalGroup(
@@ -180,9 +168,7 @@ public class Paciente extends javax.swing.JFrame {
                         .addComponent(jButton1))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(16, 16, 16)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(btnEditar)
-                            .addComponent(btnBorrar))))
+                        .addComponent(bntActulizar)))
                 .addContainerGap())
         );
 
@@ -233,64 +219,11 @@ public class Paciente extends javax.swing.JFrame {
 
     }//GEN-LAST:event_jTable1MousePressed
 
-    private void btnBorrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBorrarActionPerformed
-            int fila = jTable1.getSelectedRow();
-            PacientesDAO dao = new PacientesDAO();
-            if (fila == -1) {
-                JOptionPane.showMessageDialog(null, "Seleccione un paciente en la tabla");
-                return;
-            }
-
-            int dni = Integer.parseInt(jTable1.getValueAt(fila, 2).toString());
-
-            int confirm = JOptionPane.showConfirmDialog(null, "¿Eliminar paciente?", "Confirmar", JOptionPane.YES_NO_OPTION);
-            if (confirm == JOptionPane.YES_OPTION) {
-                boolean eliminado = dao.eliminarPaciente(dni);
-                if (eliminado) {
-                    JOptionPane.showMessageDialog(null, "Paciente eliminado");
-                    btnBuscarActionPerformed(null); // refrescar tabla
-                } else {
-                    JOptionPane.showMessageDialog(null, "Error al eliminar");
-                }
-            }
-    }//GEN-LAST:event_btnBorrarActionPerformed
-
-    private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
-            int fila = jTable1.getSelectedRow();
-            PacientesDAO dao = new PacientesDAO();
-            if (fila == -1) {
-                JOptionPane.showMessageDialog(null, "Seleccione un paciente en la tabla");
-                return;
-            }
-
-            int dni = Integer.parseInt(jTable1.getValueAt(fila, 2).toString());
-            String nombre = jTable1.getValueAt(fila, 0).toString();
-            String apellido = jTable1.getValueAt(fila, 1).toString();
-            String fecha = jTable1.getValueAt(fila, 3).toString();
-            String direccion = jTable1.getValueAt(fila, 4).toString();
-            String celular = jTable1.getValueAt(fila, 5).toString();
-            String correo = jTable1.getValueAt(fila, 6).toString();
-            String rol = jTable1.getValueAt(fila, 7).toString();
-
-          
-
-            nombre = JOptionPane.showInputDialog("Nombre:", nombre);
-            apellido = JOptionPane.showInputDialog("Apellido:", apellido);
-            fecha = JOptionPane.showInputDialog("Fecha Nac:", fecha);
-            direccion = JOptionPane.showInputDialog("Dirección:", direccion);
-            celular = JOptionPane.showInputDialog("Celular:", celular);
-            correo = JOptionPane.showInputDialog("Correo:", correo);
-
-            Usuario pacienteEditado = new Usuario(0,nombre, apellido, dni, fecha, direccion, celular, correo, "", rol);
-
-            boolean actualizado = dao.actualizarPaciente(pacienteEditado);
-            if (actualizado) {
-                JOptionPane.showMessageDialog(null, "Paciente actualizado");
-                btnBuscarActionPerformed(null); // refrescar tabla
-            } else {
-                JOptionPane.showMessageDialog(null, "Error al actualizar");
-            }
-    }//GEN-LAST:event_btnEditarActionPerformed
+    private void bntActulizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bntActulizarActionPerformed
+        PacientesDAO dao = new PacientesDAO();
+    List<Usuario> lista = dao.obtenerTodosLosUsuarios();
+    llenarTablaConPacientes(lista);
+    }//GEN-LAST:event_bntActulizarActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
             Menu men = new Menu(rolUsuario);
@@ -334,9 +267,8 @@ public class Paciente extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnBorrar;
+    private javax.swing.JButton bntActulizar;
     private javax.swing.JButton btnBuscar;
-    private javax.swing.JButton btnEditar;
     private javax.swing.JButton jButton1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;

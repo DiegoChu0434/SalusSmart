@@ -1,5 +1,7 @@
 package Interfaces;
 
+import java.util.List;
+
 public class Usuario {
     int id_usuario;
     private String nombre;
@@ -11,6 +13,10 @@ public class Usuario {
     private String correo;
     private String contraseña;
     private String rol;
+
+public Usuario() {
+ 
+}
 
     public Usuario(int id_usuario,String nombre, String apellido, int dni, String fecha, String direccion,
                    String celular, String correo, String contraseña, String rol) {
@@ -43,6 +49,18 @@ public class Usuario {
          }
 
         public void setId(int id_usuario) {
+            this.id_usuario = id_usuario;
+        }
+
+        public void setNombre(String nombre) {
+            this.nombre = nombre;
+        }
+
+        public void setApellido(String apellido) {
+            this.apellido = apellido;
+        }
+
+        public void setId_usuario(int id_usuario) {
             this.id_usuario = id_usuario;
         }
 
